@@ -1,4 +1,5 @@
-pal <- wesanderson::wes_palette("Darjeeling1")[c(1, 4, 3, 5, 2)]
+library(RColorBrewer)
+pal <- brewer.pal(5, "PiYG")
 anovas.paper <- function(x,
                          y,
                          at = c(1, 2, 3, 4, 5),
@@ -6,7 +7,7 @@ anovas.paper <- function(x,
                          ylab,
                          bplot = TRUE,
                          mean = FALSE, ...) {
-  
+
     if (bars == TRUE) {
       def.par <- par(no.readonly = TRUE)
       layout(matrix(c(2, 1, 1, 1, 1, 1), 6, 1, byrow = TRUE))
@@ -30,8 +31,8 @@ anovas.paper <- function(x,
       }
       return(s)
     }
-    
-    
+
+
     stripchart(x ~ y,
                #bty = "n",
                vertical = TRUE,
@@ -77,7 +78,7 @@ anovas.paper <- function(x,
         ...
       )
     }
-    
+
     #library(lmPerm)
     #anov <- aovp(x~as.factor(y),perm="Exact",settings=FALSE)
     #tuk <- TukeyHSD(anov,ordered=F)[1][[1]]
@@ -126,7 +127,7 @@ anovas.paper <- function(x,
             code = 3
           )
         par(def.par)
-        
+
       }
     }
     return(comp.ord)
@@ -145,9 +146,9 @@ plot.pcoa <- function(pcoa,
                                                  100, 2), "%"),
     ylab = paste0("PC", choices[2], " ", round(pcoa$eig[choices[2]] / sum(pcoa$eig) *
                                                  100, 2), "%"),
-    col = alpha(
+    bg = alpha(
       pal[unclass(group)], 0.8),
-    pch = 19,
+    pch = 21,
     cex = cex
   )
   #coord <- locator(n=1)
@@ -171,8 +172,8 @@ plot.pca <- function(ord,
   points(
     ord,
     display = "sites",
-    col = alpha(pal[unclass(group)], 0.8),
-    pch = 19,
+    bg = alpha(pal[unclass(group)], 0.8),
+    pch = 21,
     cex = 1,
     scaling = 2
   )
