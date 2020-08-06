@@ -12,7 +12,7 @@ library(brazilmaps)
 
 # brazil shapefile
 br <- brazilmaps::get_brmap("Brazil")
-
+estados_shp <- brazilmaps::get_brmap(geo = "State")
 #palette change in july 2020
 pal <- brewer.pal(5, "PiYG")
 
@@ -55,8 +55,9 @@ bioma_map <- tm_shape(bioma, bbox = st_bbox(point)) +
   tm_fill("col", alpha = 1) +
   tm_shape(point) +
   tm_symbols(col = "col", size = 0.15, alpha = 0.8) +
-  tm_shape(inset_region) +
-  tm_borders(lwd = 1.5) +
+  tm_scale_bar() +
+  #tm_shape(bboxrjes1) +
+  #tm_borders(lwd = 1.5) +
   tm_add_legend(type = "fill",
                 col = "darkseagreen4",
                 alpha = 1,
@@ -66,9 +67,16 @@ bioma_map <- tm_shape(bioma, bbox = st_bbox(point)) +
                            "Confirmed monodominance (>60%)",
                            "Confirmed non-monodominance (<60%)"),
                 col = c("white", "red", "black")) +
-  tm_layout(legend.width = 2) +
+ tm_layout(legend.width = 2,
+            legend.bg.color = "white",
+            legend.position = c("left", "top")) +
+            #legend.outside = TRUE,
+#            legend.outside.position = "right",
+ #           legend.outside.size = 1.1,
+  #          legend.stack = "horizontal"
   tm_shape(br) +
   tm_borders() +
+  #tm_compass() +
 #  tm_layout(title = expression(paste(italic("M. polymorphum"),
  #                                    " in the Brazilian Atlantic Forest")),
   #          title.fontface = 2,
@@ -77,12 +85,12 @@ bioma_map <- tm_shape(bioma, bbox = st_bbox(point)) +
   NULL
 bioma_map
 
-tmap_save(tm = bioma_map, filename = "./figs/7_map_bioma3.png")
+tmap_save(tm = bioma_map, filename = "./figs/7_map_bioma12.png")
 
 #detailed inset
 
 
-bioma_det <- tm_shape(bioma, bbox = st_bbox(inset_region)) +
+bioma_det <- tm_shape(bioma, bbox = st_bbox(bboxrjes1)) +
   tm_fill("col", alpha = 1) +
   tm_shape(point_det) +
   tm_symbols(col = "col", size = 0.3, alpha = 0.7) +
@@ -103,10 +111,10 @@ bioma_det <- tm_shape(bioma, bbox = st_bbox(inset_region)) +
   NULL
 
 bioma_det
-png(filename = "./figs/7_map_bioma4.png", res = 300,
+png(filename = "./figs/7_map_bioma10.png", res = 300,
     width = 300 / 72 * 500, height = 300 / 72 * 500)
 bioma_map
-print(bioma_det, vp = viewport(0.15, 0.85, width = 0.3, height = 0.3))
+print(bioma_det, vp = viewport(0.7, 0.25, width = 0.3, height = 0.3))
 dev.off()
 
 
@@ -114,6 +122,10 @@ dev.off()
 
 # in which biomes is the species present?
 st_join(point, bioma, st_intersects) %>% count(CD_LEGENDA)
+# in which states is the species present?
+st_crs(point)
+estados_shp <- estados_shp %>%  st_transform(st_crs(point))
+estados_intersect <- st_join(point, estados_shp, st_intersects) %>% count(nome)
 #27 caatinga, 82 cerrado, 395 Baf, 26 pampa
 
 # reads all the sosma shapefiles
@@ -142,7 +154,8 @@ bbox_all <- st_union(bboxes[[1]], bboxes[[2]]) %>%
   st_union(bboxes[[8]]) %>%
   st_union(bboxes[[9]])
 
-
+bbox_rjes <- st_union(bboxes$RJ, bboxes$ES)
+bboxrjes1 <- st_bbox(bbox_rjes) %>% st_as_sfc()
 
 ###interseções só com mata----
 intersections <- purrr::map(.x = mata,
@@ -150,10 +163,25 @@ intersections <- purrr::map(.x = mata,
                                      y = .x,
                                      join = st_intersects))
 points_in_mata <- purrr::map(intersections, ~count(., legenda, UF))
+estados_intersect <- estados_intersect %>% mutate(UF = as.factor(case_when(
+  nome == "BAHIA" ~ "BA",
+  nome == "ESPÍRITO SANTO" ~ "ES",
+  nome == "RIO DE JANEIRO" ~ "RJ",
+  nome == "SÃO PAULO" ~ "SP",
+  nome == "MINAS GERAIS" ~ "MG",
+  nome == "PARANÁ" ~ "PR",
+  nome == "RIO GRANDE DO SUL" ~ "RS",
+  nome == "DISTRITO FEDERAL" ~ "DF",
+  nome == "GOIÁS" ~ "GO",
+  nome == "MATO GROSSO DO SUL" ~ "MS",
+  nome == "SANTA CATARINA" ~ "SC"
+)))
+estados_pontos <- estados_intersect %>% data.frame() %>% mutate(legenda = "pontos totais")
+
+# only 98 points in forest features
 dominancia_in_mata <- purrr::map(intersections, ~count(., legenda, Mono, UF))
 
-bind_rows(points_in_mata) %>% filter(!is.na(UF)) %>% tally(n)
-# only 98 points in forest features
+bind_rows(points_in_mata) %>% filter(!is.na(UF))
 bind_rows(dominancia_in_mata) %>% filter(!is.na(UF)) %>% count(Mono)
 # 47 no, 48 occs (unvisited) 3 yes
 
@@ -177,4 +205,6 @@ bind_rows(dominancia_in_baf) %>% filter(!is.na(UF)) %>%
 
 #395 Baf  only 152 fall into some part of the shape
 inter_tudo_one <- bind_rows(inter_tudo) %>% filter(!is.na(UF))
-inter_tudo_one %>% count(Mono, legenda)
+estados_pontos
+inter_tudo_one %>% count(Mono, UF, legenda) %>% bind_rows(estados_pontos) %>% View()
+
