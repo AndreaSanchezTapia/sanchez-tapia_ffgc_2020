@@ -1,6 +1,6 @@
 library(RColorBrewer)
 pal <- brewer.pal(5, "PiYG")
-anovas.paper <- function(x,
+anovas.paper <- function(x = domina,
                          y,
                          at = c(1, 2, 3, 4, 5),
                          bars = FALSE,
@@ -54,9 +54,9 @@ anovas.paper <- function(x,
     medias <- tapply(x, INDEX = y, FUN = mean)
     if (mean == TRUE) {
       segments(
-        x0 = at - 0.1,
+        x0 = at - 0.2,
         y0 = medias,
-        x1 = at + 0.1,
+        x1 = at + 0.2,
         y1 = medias,
         col = "gray",
         lwd = 3
@@ -70,18 +70,15 @@ anovas.paper <- function(x,
         #mgp = c(4, 1, 1),
         add = T,
         col = alpha(pal, 0.5),
-        #border = alpha(c("red", "yellow", "darkgreen", "orange", "green"),1),
+        #border = palalpha(c("red", "yellow", "darkgreen", "orange", "green"),1),
         las = 2,
         cex.lab = 2,
         cex.axis = 2,
-        pch = ".",
-        ...
+        pch = "."
+    #    ...
       )
     }
 
-    #library(lmPerm)
-    #anov <- aovp(x~as.factor(y),perm="Exact",settings=FALSE)
-    #tuk <- TukeyHSD(anov,ordered=F)[1][[1]]
     A <- aov.perm(x, y, B = 1000, balanced = TRUE)
     holm <- p.adjust(A$Partial.p.value[, 2], "holm")
     holm.sig <- sig(as.matrix(holm))
@@ -91,7 +88,7 @@ anovas.paper <- function(x,
       cbind(A$Partial.p.value, holm, holm.sig, BH.p, BH.sig)###sumando la corrección de bonferroni
     #print(rownames(tuk)[sign(tuk[,"upr"])==sign(tuk[,"lwr"])])#hay diff
     #comparacion <- sign(tuk[,"upr"])==sign(tuk[,"lwr"])
-    comp.ord <- ANOVA[c(3, 1, 4, 2, 6, 10, 8, 7, 5, 9), ]
+    comp.ord <- tibble::rownames_to_column(ANOVA, "comparison")
     if (bars == TRUE) {
       par(mar = c(0, 4, 0, 1))
       plot(

@@ -47,7 +47,8 @@ par(mar = c(9, 7, 1, 1))
 dom <- anovas.paper(x = domina,
                     y = estructura$fire,
                     ylab = expression(paste("Relative ", italic("M. polymorphum "), "density")),
-                    bars = F)
+                    bars = FALSE,
+                    mean = TRUE)
 mtext(text = c("a", "a", "b", "c", "d"), side = 3, line = 0, at = c(1, 2, 3, 4, 5), cex = 1.1, font = 2)
 
 #el resto de la estructura (repite dominancia)
@@ -56,7 +57,7 @@ library(FD)
 anovas.table <- data.frame(row.names = 1:10)
 Simpson <- diversity(com.ord, index = "simpson")
 estructura$Simpson <- Simpson
-rar <- rarefy(com.ord, 1, se = F)## no sé por qué está dando error
+rar <- rarefy(com.ord, 1, se = F)
 estructura$rar <- rar
 png(paste("./figs/2_structure.png"),
     width = 1200 * 300 / 72,
@@ -161,7 +162,6 @@ mtext("I.", 3, las = 1, line = 0.2, cex = 1.5, at = 0.1)
 dev.off()
 
 head(estructura)
-write.csv(estructura, "./results/estructura.csv")
 
 
 #4_functional
@@ -210,27 +210,20 @@ mtext("D.", 3, las = 1, line = 0.2, cex = 1.5, at = 0.1)
 }
 dev.off()
 
-
+head(estructura)
 anovas.table
 write.csv(anovas.table, "./results/anovas_table.csv")
 write.csv(estructura, "./results/estructura.csv")
 
 
-
+# Formats anova table
 library(dplyr)
-anovas.table <- read.csv("./results/anovas_table.csv", row.names = 1)
-row.names(anovas.table) <- c("High - Low",
-                             "High - Medium",
-                             "High - Mature",
-                             "High - Secondary",
-                             "Medium - Low",
-                             "Low - Mature",
-                             "Low - Secondary" ,
-                             "Medium - Mature",
-                             "Medium - Secondary",
-                             "Secondary - Mature")
-anovas.table <- anovas.table[c(2, 1, 4, 3, 5, 9, 8, 7, 6, 10),]
+anovas.table <- readr::read_csv("./results/anovas_table.csv")
+anovas.table <- anovas.table[,-1]
+names(anovas.table)
+#reorder rows
 TABLE <- anovas.table %>%
+  mutate(Comparison = dom.comparison) %>%
   mutate(`Dominance` =
            paste0("Diff = ", round(dom.Diff, 2),
                   " (p= ", round(dom.BH.p,3), ") ", dom.BH.sig),
@@ -262,17 +255,8 @@ TABLE <- anovas.table %>%
   select(-contains("."))
 
 #rownames
-row.names(TABLE) <- c(
-  "High-Medium",
-  "High-Low",
-  "High-Secondary",
-  "High-Mature",
-  "Medium-Low",
-  "Medium-Secondary",
-  "Medium-Mature",
-  "Low-Secondary",
-  "Low-Mature",
-  "Secondary-Mature"
-)
-TABLE <- TABLE %>% tibble::rownames_to_column("Comparison")
+names(TABLE)
+
+
 write.csv(TABLE, "./results/Table3_anovas_results.csv")
+
