@@ -252,18 +252,30 @@ TABLE <- anovas.table %>%
     `Basal area (m²/ha)` =
       paste0("Diff = ", round(basalarea.Diff, 2),
              " (p= ", round(basalarea.p,3), ") ", basalarea.sig.),
-                 `LAI` =
+    `LAI` =
       paste0("Diff = ", round(LAI.Diff, 2),
              " (p= ", round(LAI.p,3), ") ", LAI.sig.),
-                 `Grass cover (%)` =
+    `Grass cover (%)` =
       paste0("Diff = ", round(Grass.Diff, 2),
              " (p= ", round(Grass.p,3), ") ", Grass.sig.),
                  `Mean plant ramification (number of trunks)` =
       paste0("Diff = ", round(ram.Diff, 2),
              " (p= ", round(ram.p,3), ") ", ram.sig.),
-                 `Mean geographic area (km²)` =
+    `Mean geographic area (km²)` =
       paste0("Diff = ", round(geog_area.Diff, 2),
              " (p= ", round(geog_area.p,3), ") ", geog_area.sig.),
+    `SLA ` =
+      paste0("Diff = ", round(SLA.Diff, 2),
+             " (p= ", round(SLA.p,3), ") ", SLA.sig.),
+    `Wood density` =
+      paste0("Diff = ", round(Wdensity.Diff, 2),
+             " (p= ", round(Wdensity.p,3), ") ", Wdensity.sig.),
+    `Bark thickness` =
+      paste0("Diff = ", round(Bthickness.Diff, 2),
+             " (p= ", round(Bthickness.p,3), ") ", Bthickness.sig.),
+    `Seed mass` =
+      paste0("Diff = ", round(Smass.Diff, 2),
+             " (p= ", round(Smass.p,3), ") ", Smass.sig.)
                                             ) %>%
   select(-contains("."))
 
