@@ -79,7 +79,8 @@ anovas.paper <- function(x = domina,
       )
     }
 
-    A <- aov.perm(x, y, B = 1000, balanced = TRUE)
+    A <- aov.perm(x, y, B = 1000, balanced = FALSE)
+    print(A$Global.p.value)
     holm <- p.adjust(A$Partial.p.value[, 2], "holm")
     holm.sig <- sig(as.matrix(holm))
     BH.p <- p.adjust(A$Partial.p.value[, 2], method = "BH")
