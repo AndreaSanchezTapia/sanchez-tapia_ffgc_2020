@@ -29,8 +29,8 @@ sam <- read_sf(shp[4])
 # prepares colour column and annotation for the inset
 bioma <- bioma %>% mutate(col = case_when(
   LEGEND == "ATLANTIC FOREST" ~  "darkseagreen4",
-  LEGEND == "CERRADO" ~  "grey75",
-  !LEGEND %in% c("ATLANTIC FOREST", "CERRADO") ~ "grey75"))
+  LEGEND == "CERRADO" ~  "grey85",
+  !LEGEND %in% c("ATLANTIC FOREST", "CERRADO") ~ "grey85"))
 bioma <- bioma %>%
   mutate(lab = if_else(LEGEND == "CERRADO", "BAF", "")) #This is only for label positioning
 
@@ -39,14 +39,14 @@ point <- point %>%
   mutate(col = case_when(
   Mono =="Occurrence" ~ "white",
   Mono =="No" ~ "black",
-  Mono =="Yes" ~ "red"))
+  Mono =="Yes" ~ "orange"))
 
 # ...for the points that were actually visited----
 point_det <- point %>%
   filter(Mono != "Occurrence") %>%
   mutate(col = case_when(
     Mono =="No" ~ "black",
-    Mono =="Yes" ~ "red"))
+    Mono =="Yes" ~ "orange"))
 
 inset_region <- st_bbox(point_det) %>%
   st_as_sfc()
@@ -64,9 +64,9 @@ bioma_map <- tm_shape(bioma, bbox = st_bbox(point)) +
                 labels = c("BAF")) +
   tm_add_legend(type = "symbol",
                 labels = c("Known occurrences",
-                           "Confirmed monodominance (>60%)",
+                           "Confirmed monodominance (≥60%)",
                            "Confirmed non-monodominance (<60%)"),
-                col = c("white", "red", "black")) +
+                col = c("white", "orange", "black")) +
  tm_layout(legend.width = 2,
             legend.bg.color = "white",
             legend.position = c("left", "top")) +
