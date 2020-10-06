@@ -140,8 +140,8 @@ pabr <-
                   "Sec. Forest",
                   "Mature Forest"
                 ),
-                #size = 0.5,
-                #legend.format = 1.5,
+                size = 1,
+                legend.format = 1.5,
                 col = pal) +
   NULL
 pabr
@@ -159,18 +159,18 @@ study_area <- sam %>% filter(is.na(NM_ESTADO)) %>%
   tm_shape(br) +
   tm_borders() +
   tm_shape(bioma) +
-  tm_fill(col = "col", alpha = 0.7) +
+  tm_fill(col = "col", alpha = 0.8) +
   tm_text(text = "lab", size = 2, col = "black") +
   tm_shape(SOS.wgs84) +
-  tm_borders(col = "red") +
+  tm_borders(col = "black", lwd = 2) +
   #tm_add_legend(type = "fill",
   #             col = c("chartreuse4"),
   #            labels = c("Brazilian Atlantic Forest (BAF)")) +
   tm_add_legend(labels = "PABR",
                 type = "symbol",
-                col = "red",
+                col = "black",
                 shape = 19,
-                size = 1.5)
+                size = 0.8)
 study_area
 tmap_save(study_area, "./figs/00_study_area.png", width = 5, height = 6)
 
